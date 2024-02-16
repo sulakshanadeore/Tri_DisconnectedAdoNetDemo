@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Web;
 using System.Web.Mvc;
 using DisconnectedAdoNetDemo.Models;
@@ -31,7 +32,15 @@ namespace DisconnectedAdoNetDemo.Controllers
         // GET: Dept/Details/5
         public ActionResult Details(int id)
         {
-            return View();
+            DeptDAL dal= new DeptDAL();
+            Dept dept=dal.FindDept(id);
+            DeptModel model = new DeptModel();
+            model.Deptno= dept.Deptno;
+            model.Dname=dept.Dname; 
+            model.Loc=dept.Loc;
+            model.MgrName = dept.MgrName;
+
+            return View(model);
         }
 
         // GET: Dept/Create
@@ -65,7 +74,16 @@ namespace DisconnectedAdoNetDemo.Controllers
         // GET: Dept/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+
+            DeptDAL dal = new DeptDAL();
+            Dept dept = dal.FindDept(id);
+            DeptModel model = new DeptModel();
+            model.Deptno = dept.Deptno;
+            model.Dname = dept.Dname;
+            model.Loc = dept.Loc;
+            model.MgrName = dept.MgrName;
+
+            return View(model);
         }
 
         // POST: Dept/Edit/5
@@ -76,18 +94,42 @@ namespace DisconnectedAdoNetDemo.Controllers
             {
                 // TODO: Add update logic here
 
-                return RedirectToAction("Index");
+                DeptDAL dal = new DeptDAL();
+                Dept d = new Dept();
+                d.Deptno = Convert.ToInt32(collection["Deptno"]);
+                d.Dname = collection["Dname"].ToString();
+                d.Loc = collection["Loc"].ToString();
+                d.MgrName = collection["MgrName"].ToString();
+
+                bool status = dal.EditDept(d, id);
+                if (status)
+                {
+                    return RedirectToAction("Index");
+                }
+                    
+                
+                
             }
             catch
             {
                 return View();
             }
+            return RedirectToAction("Index");
         }
 
         // GET: Dept/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
+
+            DeptDAL dal = new DeptDAL();
+            Dept dept = dal.FindDept(id);
+            DeptModel model = new DeptModel();
+            model.Deptno = dept.Deptno;
+            model.Dname = dept.Dname;
+            model.Loc = dept.Loc;
+            model.MgrName = dept.MgrName;
+
+            return View(model);
         }
 
         // POST: Dept/Delete/5
@@ -97,13 +139,20 @@ namespace DisconnectedAdoNetDemo.Controllers
             try
             {
                 // TODO: Add delete logic here
-
-                return RedirectToAction("Index");
+                DeptDAL dal = new DeptDAL();
+           bool status =    dal.RemoveDept(id);
+                if (status)
+                
+                    return RedirectToAction("Index");
+                
+                
             }
             catch
             {
                 return View();
             }
+            return RedirectToAction("Index");
+              
         }
     }
 }

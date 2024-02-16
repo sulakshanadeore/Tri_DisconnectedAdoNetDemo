@@ -67,8 +67,22 @@ namespace DisconnectedLibrary
             bool operationStatus = false;
             string str = ConfigurationManager.ConnectionStrings["HRConnectionString"].ConnectionString;
             SqlConnection cn = new SqlConnection(str);
-                     cn.Close();
-                cn.Dispose();
+
+            SqlDataAdapter da = new SqlDataAdapter("Select * from dept", cn);
+            DataSet ds = new DataSet();
+            da.MissingSchemaAction=MissingSchemaAction.AddWithKey;  
+            da.Fill(ds, "dept-inMemory");//line 73( da.MissingSchemaActdrion=MissingSchemaAction.AddWithKey;) will bring the pk info in the in memory table
+          DataRow drow  = ds.Tables["dept-inMemory"].Rows.Find(deptno);
+            if (drow != null) 
+            {
+                drow["Dname"] = dept.Dname;
+                drow["Loc"] = dept.Loc;
+                drow["MgrName"] = dept.MgrName;
+                SqlCommandBuilder bldr = new SqlCommandBuilder(da);
+                da.Update(ds.Tables["dept-inMemory"]);
+                operationStatus = true;
+            }
+                  
 
             
             return operationStatus;
@@ -79,11 +93,26 @@ namespace DisconnectedLibrary
             bool operationStatus = false;
             string str = ConfigurationManager.ConnectionStrings["HRConnectionString"].ConnectionString;
             SqlConnection cn = new SqlConnection(str);
+            SqlDataAdapter da = new SqlDataAdapter("Select * from dept", cn);
+            DataSet ds = new DataSet();
+            da.MissingSchemaAction = MissingSchemaAction.AddWithKey;
+            da.Fill(ds, "dept-inMemory");//line 73( da.MissingSchemaActdrion=MissingSchemaAction.AddWithKey;) will bring the pk info in the in memory table
+            DataRow drow = ds.Tables["dept-inMemory"].Rows.Find(deptno);
+            if (drow != null)
+            {
+                //ds.Tables["dept-inMemory"].Rows.Find(deptno).Delete();
 
-        
-            operationStatus = true;
-            cn.Close();
-            cn.Dispose();
+                drow.Delete();
+                SqlCommandBuilder bldr = new SqlCommandBuilder(da);
+                da.Update(ds.Tables["dept-inMemory"]);
+            }
+
+
+
+
+                operationStatus = true;
+         
+         
 
             return operationStatus;
         
@@ -132,7 +161,13 @@ namespace DisconnectedLibrary
             string str = ConfigurationManager.ConnectionStrings["HRConnectionString"].ConnectionString;
             SqlConnection cn = new SqlConnection(str);
             int cnt = 0;
+            SqlDataAdapter da = new SqlDataAdapter("Select * from dept", cn);
 
+            DataSet ds = new DataSet();
+            da.MissingSchemaAction = MissingSchemaAction.AddWithKey;//Primary key info about the table, also brings the identity 
+            //columns
+            da.Fill(ds, "dept");
+            cnt = ds.Tables["dept-inMemory"].Rows.Count;
             return cnt;
 
 
@@ -145,10 +180,21 @@ namespace DisconnectedLibrary
             Dept dept = new Dept();
             string str = ConfigurationManager.ConnectionStrings["HRConnectionString"].ConnectionString;
             SqlConnection cn = new SqlConnection(str);
+            SqlDataAdapter da = new SqlDataAdapter("Select * from dept", cn);
 
-            
-            cn.Close();
-            cn.Dispose();
+            DataSet ds = new DataSet();
+            da.MissingSchemaAction = MissingSchemaAction.AddWithKey;//Primary key info about the table, also brings the identity 
+            //columns
+            da.Fill(ds, "dept");
+            DataRow drow = ds.Tables["dept"].Rows.Find(deptno);
+          
+            if (drow != null)
+            {
+                dept.Deptno = deptno;
+                dept.Dname = drow["Dname"].ToString();
+                dept.Loc=drow["Loc"].ToString();
+                dept.MgrName = drow["MgrName"].ToString();
+            }
             return dept;
         }
 
