@@ -13,9 +13,70 @@ namespace DisconnectedLibrary
     public class DeptDAL
     {
 
+        public DataView FilterData() 
+        {
+
+            string str = ConfigurationManager.ConnectionStrings["HRConnectionString"].ConnectionString;
+            SqlConnection cn = new SqlConnection(str);
+
+            SqlDataAdapter da = new SqlDataAdapter("Select * from dept", cn);
+
+            DataSet ds = new DataSet();
+            da.MissingSchemaAction = MissingSchemaAction.AddWithKey;//Primary key info about the table, also brings the identity 
+            //columns
+
+            da.Fill(ds, "dept");//data table---we disconnected, and u r on your app server
+            DataView dv = ds.Tables["dept"].DefaultView;
+            return dv;
+
+
+        }
+
+        public DataView FilterDataByCity()
+        {
+
+            string str = ConfigurationManager.ConnectionStrings["HRConnectionString"].ConnectionString;
+            SqlConnection cn = new SqlConnection(str);
+
+            SqlDataAdapter da = new SqlDataAdapter("Select * from dept", cn);
+
+            DataSet ds = new DataSet();
+            da.MissingSchemaAction = MissingSchemaAction.AddWithKey;//Primary key info about the table, also brings the identity 
+            //columns
+
+            da.Fill(ds, "dept");//data table---we disconnected, and u r on your app server
+            DataView dv = new DataView(ds.Tables["dept"]);
+
+            //dv.RowFilter = "Loc like 'Mumbai'";
+            dv.RowFilter = "Deptno>=103 AND Deptno<=109";        
+            return dv;
+
+
+        }
+
+
+        public DataView SortData()
+        {
+            string str = ConfigurationManager.ConnectionStrings["HRConnectionString"].ConnectionString;
+            SqlConnection cn = new SqlConnection(str);
+
+            SqlDataAdapter da = new SqlDataAdapter("Select * from dept", cn);
+
+            DataSet ds = new DataSet();
+            da.MissingSchemaAction = MissingSchemaAction.AddWithKey;//Primary key info about the table, also brings the identity 
+            //columns
+
+            da.Fill(ds, "dept");//data table---we disconnected, and u r on your app server
+            ds.Tables["dept"].DefaultView.Sort = "Loc DESC";
+            DataView dvSort = ds.Tables["dept"].DefaultView;
+            //dv.Sort = "Loc by Ascending";
+            return dvSort;
+        }
+
 
         public bool AddDept(Dept dept) 
         {
+
             bool operationStatus = false;
             string str=ConfigurationManager.ConnectionStrings["HRConnectionString"].ConnectionString;
             SqlConnection cn = new SqlConnection(str);
